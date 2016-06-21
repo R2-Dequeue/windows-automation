@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>twitch launcher</title>
+	<meta http-equiv="x-ua-compatible" content="ie=9">
+	<HTA:APPLICATION
+		ApplicationName = "twitch launcher"
+		Border = "Dialog"
+		MaximizeButton = "No"
+	>
+
+	<script>
+		// Center and size the window
+		var windowWidth		= Math.max(300*screen.width/1920, 200),
+			windowHeight	= Math.max(200*screen.height/1080, 133);
+		window.resizeTo(windowWidth, windowHeight);
+		window.moveTo((screen.width - windowWidth)/2, (screen.height - windowHeight)/2);
+		
+		var wshShell = new ActiveXObject('Wscript.Shell'),
+			config =
+			{
+				cmd:			'%USERPROFILE%/Binaries/Console', // '%COMSPEC%'
+				livestreamer:	'%USERPROFILE%/Binaries/livestreamer-v1.12.2/livestreamer.exe',
+				vlc:			'C:/Program Files (x86)/VideoLAN/VLC/vlc.exe',
+				cacheMs:		5000,
+				threads:		2,
+			};
+		
+		// Setup once the page is loaded
+		window.addEventListener('load', function ()
+		{
+			var username = document.getElementById('username');
+			
+			username.value = (window.clipboardData.getData('Text') || '').trim();
+			username.select();
+		
+		}, false);
+		
+		function launchVLC()
+		{
+			// "14,000 viewers on Channel"
+			// "https://www.twitch.tv/channel"
+			// "https://www.twitch.tv/channel/profile"
+			var name	=	document.getElementById('username').value.replace(/\s+/g, '').toLowerCase(),
+				command	=	config['cmd'] + ' /K set ERRORLEVEL= && ' +
+							config['livestreamer'] + ' "twitch.tv/' + name + '" source --player "\'' + config['vlc'] + '\' --fullscreen --file-caching ' + config['cacheMs'] + ' --network-caching ' + config['cacheMs'] + '" --hls-segment-threads ' + config['threads'] +
+							' && echo Exit code: %ERRORLEVEL%';
+			
+			wshShell.Run(command);
+			
+			window.close();
+			return false;
+		}
+	</script>
+</head>
+
+<body>
+	<form onsubmit="return launchVLC();">
+		<input type="text" id="username" /><br />
+		<input type="submit" value="Launch VLC" />
+	</form>
+</body>
+
+</html>
