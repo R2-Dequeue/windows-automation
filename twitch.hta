@@ -22,11 +22,22 @@
 			{
 				cmd:			'%USERPROFILE%/Binaries/Console', // '%COMSPEC%'
 				livestreamer:	'%USERPROFILE%/Binaries/livestreamer-v1.12.2/livestreamer.exe',
-				vlc:			wshShell.RegRead('HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\VideoLAN\\VLC\\'),
-				//vlc:			wshShell.RegRead('HKEY_LOCAL_MACHINE\\Software\\VideoLan\\VLC\\'),
 				cacheMs:		5000,
 				threads:		2,
 			};
+		
+		// Get VLC path
+		try
+		{
+			config['vlc'] = wshShell.RegRead('HKEY_LOCAL_MACHINE\\Software\\VideoLan\\VLC\\');
+		}
+		catch (e)
+		{
+			config['vlc'] = wshShell.RegRead('HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\VideoLAN\\VLC\\');
+		}
+		
+		if (!config['vlc'])
+			config['vlc'] = 'vlc.exe';
 		
 		// Setup once the page is loaded
 		window.addEventListener('load', function ()
